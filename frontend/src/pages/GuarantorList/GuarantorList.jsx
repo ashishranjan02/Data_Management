@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Card,
@@ -11,15 +11,21 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
-import { VerifiedUser as GuarantorIcon } from "@mui/icons-material";
+import {
+  VerifiedUser as GuarantorIcon,
+  PictureAsPdf as PdfIcon,
+  Visibility as ViewIcon,
+} from "@mui/icons-material";
+import { useFormik } from "formik";
 import SectionHeader from "../../layout/SectionHeader";
 import StyledTextField from "../../ui/StyledTextField";
+import {GuarantorPdf} from "./GuarantorPdf.jsx"; 
 
 const GuarantorList = () => {
-  const [selectedMember, setSelectedMember] = useState("");
-
-  //  Dummy Members
+  // Dummy Members
   const members = [
     { id: "M001", name: "John Doe" },
     { id: "M002", name: "Jane Smith" },
@@ -28,7 +34,7 @@ const GuarantorList = () => {
     { id: "M005", name: "David Brown" },
   ];
 
-  //  Dummy “Guarantor For” Data (who this member guarantees)
+  // Dummy “Guarantor For” Data
   const guarantorFor = {
     M001: [
       { id: 1, name: "Jane Smith", phone: "9876543210" },
@@ -40,7 +46,7 @@ const GuarantorList = () => {
     M005: [{ id: 1, name: "John Doe", phone: "8887776665" }],
   };
 
-  //  Dummy “Has Guarantors” Data (who guarantees this member)
+  // Dummy “Has Guarantors” Data
   const hasGuarantors = {
     M001: [{ id: 1, name: "Michael Johnson", phone: "8885554443" }],
     M002: [
@@ -55,11 +61,30 @@ const GuarantorList = () => {
     ],
   };
 
+  // Formik
+  const formik = useFormik({
+    initialValues: {
+      memberId: "",
+    },
+    onSubmit: (values) => {
+      console.log("Selected Member:", values.memberId);
+    },
+  });
+
+  const selectedMember = formik.values.memberId;
   const selectedFor = guarantorFor[selectedMember] || [];
   const selectedHas = hasGuarantors[selectedMember] || [];
 
+  const selectedMemberData = members.find((m) => m.id === selectedMember);
+
   return (
-    <Card sx={{ borderRadius: 3, boxShadow: "0 8px 32px rgba(0,0,0,0.1)", mt: 4 }}>
+    <Card
+      sx={{
+        borderRadius: 3,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+        mt: 4,
+      }}
+    >
       <CardContent sx={{ p: 4 }}>
         <SectionHeader
           icon={<GuarantorIcon color="primary" />}
@@ -67,32 +92,55 @@ const GuarantorList = () => {
           subtitle="Select a member to view guarantor relationships"
         />
 
-        {/* 🔹 Member Selection */}
-        <Grid container spacing={2} mt={2}>
-          <Grid size={{xs:6, sm:6, md:3}}>
-            <StyledTextField
-              select
-              fullWidth
-              label="Select Member"
-              value={selectedMember}
-              onChange={(e) => setSelectedMember(e.target.value)}
-            >
-              <MenuItem value="">Select Member</MenuItem>
-              {members.map((m) => (
-                <MenuItem key={m.id} value={m.id}>
-                  {m.name} ({m.id})
-                </MenuItem>
-              ))}
-            </StyledTextField>
-          </Grid>
-        </Grid>
+        {/* 🔹 Member Selection + PDF button */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+            mt: 3,
+            mb: 2,
+          }}
+        >
+          <StyledTextField
+            select
+            name="memberId"
+            label="Select Member"
+            value={formik.values.memberId}
+            onChange={formik.handleChange}
+            sx={{ width: "250px" }}
+          >
+            <MenuItem value="">Select Member</MenuItem>
+            {members.map((m) => (
+              <MenuItem key={m.id} value={m.id}>
+                {m.name} ({m.id})
+              </MenuItem>
+            ))}
+          </StyledTextField>
 
-        {/* 🔸 Display Tables Only When Member Selected */}
+          {/* PDF Preview/Download */}
+          {selectedMember && (
+            <Tooltip title="Download PDF">
+              <IconButton
+                color="error"
+                onClick={() => {
+                  const selectedMemberData = members.find((m) => m.id === selectedMember);
+                  GuarantorPdf(selectedMemberData, selectedFor || [], selectedHas || []);
+                }}
+              >
+                <PdfIcon fontSize="large" />
+              </IconButton>
+            </Tooltip>
+          )}
+        </Box>
+
+        {/* 🔸 Display Tables */}
         {selectedMember && (
-          <Box mt={4}>
+          <Box mt={2}>
             {/* Member is Guarantor For */}
             <Typography variant="h6" color="primary" gutterBottom>
-              {members.find((m) => m.id === selectedMember)?.name} is Guarantor For:
+              {selectedMemberData?.name} is Guarantor For:
             </Typography>
             {selectedFor.length > 0 ? (
               <Table size="small" sx={{ mb: 4 }}>
@@ -101,6 +149,7 @@ const GuarantorList = () => {
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>S.No</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>Name</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>Phone Number</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -109,6 +158,13 @@ const GuarantorList = () => {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.phone}</TableCell>
+                      <TableCell>
+                        <Tooltip title="View Details">
+                          <IconButton color="primary">
+                            <ViewIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -121,7 +177,7 @@ const GuarantorList = () => {
 
             {/* Member Has These Guarantors */}
             <Typography variant="h6" color="primary" gutterBottom>
-              {members.find((m) => m.id === selectedMember)?.name} Has These Guarantors:
+              {selectedMemberData?.name} Has These Guarantors:
             </Typography>
             {selectedHas.length > 0 ? (
               <Table size="small">
@@ -130,6 +186,7 @@ const GuarantorList = () => {
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>S.No</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>Name</TableCell>
                     <TableCell sx={{ color: "white", fontWeight: "bold" }}>Phone Number</TableCell>
+                    <TableCell sx={{ color: "white", fontWeight: "bold" }}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -138,6 +195,13 @@ const GuarantorList = () => {
                       <TableCell>{index + 1}</TableCell>
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.phone}</TableCell>
+                      <TableCell>
+                        <Tooltip title="View Details">
+                          <IconButton color="primary">
+                            <ViewIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
