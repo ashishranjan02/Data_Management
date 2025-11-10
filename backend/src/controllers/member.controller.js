@@ -41,18 +41,18 @@ export const createMember = async (req, res) => {
             const cloudinaryResult = await uploadOnCloudinary(file.path);
             
             if (cloudinaryResult && cloudinaryResult.secure_url) {
-              console.log(`✅ Cloudinary upload successful: ${cloudinaryResult.secure_url}`);
+              console.log(` Cloudinary upload successful: ${cloudinaryResult.secure_url}`);
               fileFields[fieldname] = cloudinaryResult.secure_url;
             } else {
-              console.log(`❌ Cloudinary upload failed for: ${fieldname}`);
+              console.log(`Cloudinary upload failed for: ${fieldname}`);
               fileFields[fieldname] = ""; // Set empty string if upload fails
             }
           } catch (uploadError) {
-            console.error(`❌ Error uploading ${fieldname} to Cloudinary:`, uploadError);
+            console.error(` Error uploading ${fieldname} to Cloudinary:`, uploadError);
             fileFields[fieldname] = ""; // Set empty string on error
           }
         } else {
-          console.log(`❌ No file found for: ${fieldname}`);
+          console.log(` No file found for: ${fieldname}`);
           fileFields[fieldname] = "";
         }
       }

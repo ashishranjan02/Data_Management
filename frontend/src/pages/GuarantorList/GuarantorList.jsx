@@ -99,8 +99,6 @@ const GuarantorList = () => {
             justifyContent: "center",
             alignItems: "center",
             gap: 2,
-            mt: 3,
-            mb: 2,
           }}
         >
           <StyledTextField

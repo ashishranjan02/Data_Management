@@ -117,6 +117,16 @@ const memberSchema = new mongoose.Schema(
       ],
     },
 
+    // ==== Notice ====
+    noticeDetails:[
+      {
+        nameOfMember: { type: String },
+        membershipNumber: { type: String },
+        note:{type: String},
+        file:{type: String},
+      },
+    ],
+
     // ===== LOAN DETAILS =====
     loanDetails: [
       {

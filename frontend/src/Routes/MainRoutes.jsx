@@ -7,6 +7,7 @@ import MissingMembersTable from '../pages/MemberReport/Report.jsx'
 import FestivalGreetingPage from '../pages/Greeting'
 import GuarantorPage from '../pages/Guarantor/Guarantor.jsx';
 import GuarantorList from '../pages/GuarantorList/GuarantorList.jsx'
+import NoticePage from '../pages/Notice/Notice.jsx'
 const MainRoutes = () => {
   return (
     <Routes>
@@ -18,6 +19,7 @@ const MainRoutes = () => {
         <Route path="/greeting" element={<FestivalGreetingPage />} />
         <Route path="/guarantor" element={<GuarantorPage />} />
         <Route path="/guarantorList" element={<GuarantorList />} />
+        <Route path="/notice" element={<NoticePage />} />
       </Route>
     </Routes>
 

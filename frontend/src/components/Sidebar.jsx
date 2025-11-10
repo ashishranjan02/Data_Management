@@ -15,6 +15,8 @@ import AssessmentIcon from "@mui/icons-material/Assessment";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { Link } from "react-router-dom";
 import { People } from "@mui/icons-material";
+// import NoticeIcon  from "@mui/icons-material";
+
 
 const Sidebar = () => {
     const menuItems = [
@@ -26,6 +28,7 @@ const Sidebar = () => {
         { label: "Greeting", route: "/greeting", icon: <EventSeatIcon /> },
         { label: "Guarantor", route:"/guarantor", icon: <People />},
         { label: "Guarantor List", route:"/guarantorList", icon: <People />},
+        { label: "Notice", route:"/notice"}
     ];
 
     return (
